@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Каталог букетов</h2>
+
+<ul>
+    {% for product in products %}
+         <li class="mb-4">
+            <h3>{{ product.name }}</h3>
+            <p>Цена: {{ product.price }} руб.</p>
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" width="200">
+            {% endif %}
+            <p>{{ product.description }}</p>
+            <form method="post" action="{% url 'add_to_cart' %}">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+            <button type="submit" class="btn btn-success">В корзину</button>
+            </form>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

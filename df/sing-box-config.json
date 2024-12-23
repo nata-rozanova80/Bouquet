@@ -1,0 +1,87 @@
+{
+  "dns": {
+    "independent_cache": true,
+    "rules": [
+      {
+        "query_type": [
+          32,
+          33
+        ],
+        "server": "dns-block"
+      },
+      {
+        "domain_suffix": ".lan",
+        "server": "dns-block"
+      }
+    ],
+    "servers": [
+      {
+        "address": "https://8.8.8.8/dns-query",
+        "detour": "proxy",
+        "strategy": "",
+        "tag": "dns-remote"
+      }
+    ]
+  },
+  "inbounds": [
+    {
+      "auto_route": true,
+      "domain_strategy": "",
+      "endpoint_independent_nat": true,
+      "inet4_address": "172.19.0.1/28",
+      "interface_name": "nekoray-tun",
+      "mtu": 1500,
+      "sniff": true,
+      "sniff_override_destination": false,
+      "stack": "gvisor",
+      "strict_route": false,
+      "tag": "tun-in",
+      "type": "tun"
+    }
+  ],
+  "log": {
+    "level": "info"
+  },
+  "outbounds": [
+    {
+      "domain_strategy": "",
+      "flow": "xtls-rprx-vision",
+      "packet_encoding": "xudp",
+      "server": "1.2.3.4",
+      "server_port": 443,
+      "tag": "proxy",
+      "tls": {
+        "alpn": [
+          "h2"
+        ],
+        "enabled": true,
+        "reality": {
+          "enabled": true,
+          "public_key": "U2qtkS5yxwxjDL48X_OPn39Zf_MWYlVQLk4oBr6R_io",
+          "short_id": "16423edce09410f7"
+        },
+        "server_name": "dl.google.com",
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      },
+      "type": "vless",
+      "uuid": "96b2d74b-442c-42f1-ba2a-171387270227"
+    },
+    {
+      "tag": "dns-remote",
+      "type": "dns"
+    }
+  ],
+  "route": {
+    "auto_detect_interface": true,
+    "final": "proxy",
+    "rules": [
+      {
+        "outbound": "dns-remote",
+        "protocol": "dns"
+      }
+    ]
+  }
+}

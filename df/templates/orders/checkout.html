@@ -1,0 +1,16 @@
+<!-- templates/orders/checkout.html -->
+{% extends 'base.html' %}
+
+{% block title %}Оформление заказа{% endblock %}
+
+{% block content %}
+<h2>Оформление заказа</h2>
+
+<form method="post" class="mb-4">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Оформить заказ</button>
+</form>
+
+<p><a href="{% url 'product_list' %}">Вернуться к каталогу</a></p>
+{% endblock %}

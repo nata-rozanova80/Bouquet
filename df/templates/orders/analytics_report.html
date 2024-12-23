@@ -1,0 +1,77 @@
+<!-- orders/templates/orders/analytics_report.html -->
+{% extends 'base.html' %}
+
+{% block title %}Аналитический отчет{% endblock %}
+
+{% block content %}
+<h2>Аналитический отчет</h2>
+
+<div class="mb-4">
+    <h4>Общий объем продаж: {{ total_sales }} руб.</h4>
+    <h4>Количество проданных товаров: {{ total_products_sold }} шт.</h4>
+</div>
+
+<div class="mb-4">
+    <h4>Самые популярные товары:</h4>
+    <ul class="list-group">
+        {% for product in popular_products %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ product.product__name }}
+                <span class="badge bg-primary rounded-pill">{{ product.total_sold }} шт.</span>
+            </li>
+        {% empty %}
+            <li class="list-group-item">Нет данных.</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="mb-4">
+    <h4>Доход по статусам заказов:</h4>
+    <ul class="list-group">
+        {% for status in revenue_by_status %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ status.order__status|capfirst }}
+                <span class="badge bg-success rounded-pill">{{ status.total }} руб.</span>
+            </li>
+        {% empty %}
+            <li class="list-group-item">Нет данных.</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="mb-4">
+    <h4>Количество заказов по дням (последний месяц):</h4>
+    <canvas id="ordersChart" width="400" height="200"></canvas>
+</div>
+
+<!-- Подключение Chart.js для визуализации данных -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('ordersChart').getContext('2d');
+    const ordersData = {
+        labels: [{% for order in orders_by_day %}"{{ order.day }}",{% endfor %}],
+        datasets: [{
+            label: 'Количество заказов',
+            data: [{% for order in orders_by_day %}{{ order.count }},{% endfor %}],
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor:  'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+        }]
+    };
+    const ordersChart = new Chart(ctx, {
+        type: 'line',
+        data: ordersData,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    precision:0
+                }
+            }
+        }
+    });
+</script>
+<div class="mb-4">
+    <a href="{% url 'export_analytics_csv' %}" class="btn btn-outline-secondary">Экспортировать отчет в CSV</a>
+</div>
+{% endblock %}
